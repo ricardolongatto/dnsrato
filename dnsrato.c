@@ -1,38 +1,81 @@
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#include "dnsrato.h"
 
-int main(int argc, char *argv[])
-{
-	char *alvo;
-	alvo = argv[1];
-	struct hostent *host;
-	char *result;
-	char txt[50];
-	FILE *rato;
-	rato = fopen(argv[2],"r");
-	
-	if(argc < 2)
-	{
-	printf("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|\n");
-	printf("|-|-|-|-|-|-|-|-|-|-|-|.. DNSRATO v1.0 .. |-|-|-|-|-|-|-|-|-|-|-|-|-|\n");
-	printf("|-|-|-|-|-|-|-|-| Uso: ./dnsrato alvo.com.br rato.txt |-|-|-|-|-|-|-|\n");
-	printf("|-|-|-|-|-| Ricardo Longatto -- ricardolongatto@gmail.com |-|-|-|-|-|\n");
-	printf("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|\n");
-	return(0);
+void splash(void) {
+    printf("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|\n");
+    printf("|-|-|-|-|-|-|-|-|-|-|-|.. DNSRATO v1.0 .. |-|-|-|-|-|-|-|-|-|-|-|-|-|\n");
+    printf("|-|-|-|-|-|-|-|-| Uso: ./dnsrato alvo.com.br rato.txt |-|-|-|-|-|-|-|\n");
+    printf("|-|-|-|-|-| Ricardo Longatto -- ricardolongatto@gmail.com |-|-|-|-|-|\n");
+    printf("|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|-|\n");
+}
+
+int file_possible_len(FILE * fp) {
+  	char c;
+  	int lines = 0;
+  	while (!feof(fp)) {
+        c = fgetc(fp);
+	  	if (c == 0x0a) {
+		  	lines++;
+		}
+	}
+    rewind(fp);
+	return ++lines;
+}
+
+void 
+nslookup (const int argc, char ** argv, dnsdata_v * dnsV) {
+	char * result;
+	FILE * rato;
+    char txt[50];
+   	struct hostent * host;
+    
+
+    BOOL matched = FALSE;
+    size_t i = 0;
+    
+
+    rato = ( (argc < 3) ? fopen (DEFAULT_WORLDLIST, "r") : fopen (argv[2], "r") );
+  	if (rato == NULL) {
+		fprintf (stderr, "[ERROR] - Opening the file: %s\n",
+				 ( (argc < 3) ? DEFAULT_WORLDLIST : argv[2]) );
+        exit (1);
 	}
 
-	while(fscanf(rato, "%s", &txt) != EOF)
-		{
-		result = (char *) strcat(txt,alvo);
-		host=gethostbyname(result);
-		if(host == NULL)
-		{	
-		continue;
-		}
-		printf("HOST ENCONTRADO: %s ====> IP: %s \n", result, inet_ntoa(*((struct in_addr *)host->h_addr)));
-		}
+	dnsV->dnsData = (dnsdata_t *) calloc(file_possible_len (rato), sizeof(dnsdata_t) );
+    
+	while(fscanf(rato, "%s", &txt) != EOF) {
+		result = (char *) strcat (txt,argv[1]);
+		host=gethostbyname (result);
+		if (host == NULL) {
+			continue;
+        } else {
+            strncpy (dnsV->dnsData[i].host, result, HOSTLEN);
+            dnsV->dnsData[i].host_t = host;
+            matched = TRUE;
+            i++;
+        }
+	}
+
+    
+    if (matched == FALSE) {
+         free (dnsV->dnsData);
+         dnsV->dnsData = NULL;
+    } 
+    dnsV->size = i;
+}
+
+
+void
+nslookup_dump (dnsdata_v * dnsV) {
+    dnsdata_t * t;
+           
+    if (dnsV->dnsData == NULL) {
+        fprintf (stderr, "[WARN] - Got nothing [!!]\n");
+        return;
+    }
+    size_t i;
+ 
+    for (i = 0; i < dnsV->size; i++) {
+        t = &(dnsV->dnsData[i]);
+        printf("HOST ENCONTRADO: %s ====> IP: %s \n", (t->host), inet_ntoa( *( (struct in_addr *)(t->host_t)->h_addr) ) ); 
+    }
 }
