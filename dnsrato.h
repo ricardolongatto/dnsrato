@@ -20,7 +20,7 @@
 
 typedef struct _dns_data_t {
     char host[128];
-    struct hostent * host_t;
+    char * host_addr;
     
 } dnsdata_t;
 
