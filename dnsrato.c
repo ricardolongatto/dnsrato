@@ -49,7 +49,7 @@ nslookup (const int argc, char ** argv, dnsdata_v * dnsV) {
 			continue;
         } else {
             strncpy (dnsV->dnsData[i].host, result, HOSTLEN);
-            dnsV->dnsData[i].host_addr = inet_ntoa ( *( (struct in_addr *)(host)->h_addr));
+            strncpy ((dnsV->dnsData[i].host_addr), inet_ntoa ( *( (struct in_addr *)(host)->h_addr)), ADDRLEN);
             matched = TRUE;
             i++;
         }
@@ -75,7 +75,6 @@ nslookup_dump (dnsdata_v * dnsV) {
     size_t i;
  
     for (i = 0; i < dnsV->size; i++) {
-        t = &(dnsV->dnsData[i]);
-        printf("HOST ENCONTRADO: %s ====> IP: %s \n", (t->host), t->host_addr); 
+        printf("HOST ENCONTRADO: %s ====> IP: %s \n", dnsV->dnsData[i].host, dnsV->dnsData[i].host_addr); 
     }
 }
