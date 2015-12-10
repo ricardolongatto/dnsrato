@@ -10,17 +10,18 @@
 #include <netdb.h>
 
 
-#define HOSTLEN   128
-#define WORDLEN     50
-#define DEFAULT_WORLDLIST "rato.txt"
-#define BOOL    unsigned char
-#define TRUE    1
-#define FALSE   0
+#define HOSTLEN             128
+#define ADDRLEN             15
+#define WORDLEN             50
+#define DEFAULT_WORLDLIST   "rato.txt"
+#define BOOL                unsigned char
+#define TRUE                1
+#define FALSE               0
 
 
 typedef struct _dns_data_t {
-    char host[128];
-    char * host_addr;
+    char host[HOSTLEN];
+    char host_addr[ADDRLEN];
     
 } dnsdata_t;
 
