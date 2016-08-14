@@ -1,3 +1,6 @@
+/* System header file */
+#include<stdlib.h>
+
 #include "dnsrato.h"
 
 int main (int argc, char ** argv) 

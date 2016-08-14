@@ -1,14 +1,8 @@
 #ifndef DNSRATO_H_
 #define DNSRATO_H_
 
-
-#include <string.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <sys/types.h>
-#include <arpa/inet.h>
-#include <netdb.h>
-
+/* System header files */
+#include<stdio.h>
 
 #define HOSTLEN   128
 #define WORDLEN     50
@@ -16,7 +10,6 @@
 #define BOOL    unsigned char
 #define TRUE    1
 #define FALSE   0
-
 
 typedef struct _dns_data_t {
     char host[128];

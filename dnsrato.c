@@ -1,3 +1,11 @@
+/* System header files */
+#include <string.h>
+#include <stdlib.h>
+#include <sys/types.h>
+#include <arpa/inet.h>
+#include <netdb.h>
+
+/* Custom headers */
 #include "dnsrato.h"
 
 void splash(void) 
